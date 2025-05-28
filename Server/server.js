@@ -20,12 +20,7 @@ dotenv.config();
 connectDatabase();
 const app = express();
 app.use(express.json());
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-customer-app.vercel.app', 'https://your-admin-app.vercel.app']
-    : 'http://localhost:3000',
-  credentials: true
-}));
+app.use(cors());
 app.use(
     fileUpload({
         useTempFiles: true,
@@ -52,14 +47,6 @@ app.get("/api/config/paypal", (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-// Handle Unhandled Promise Rejections
-process.on('unhandledRejection', (err) => {
-  console.log('Error:', err.message);
-  console.log('Shutting down server due to Unhandled Promise rejection');
-  server.close(() => process.exit(1));
-});
+const PORT = process.env.PORT || 1000;
 
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, console.log(`Server run in port ${PORT}`));
