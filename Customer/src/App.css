@@ -179,7 +179,7 @@ textarea:focus {
 }
 
 .card-header.gradient {
-  padding: 10px 0;
+  padding: 0;
   border-radius: 10px;
   background: linear-gradient(to right, #34a110, #89abd2);
 }

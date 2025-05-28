@@ -227,10 +227,172 @@ const ShopSection = () => {
                 </header>
               </div>
             </div>
-            <div
-              className="col-lg-12 col-md-12 article"
-              style={{ marginTop: "20px" }}
-            >
+
+            {/* TOP 5 SẢN PHẨM BÁN CHẠY - Chỉ hiện khi không có tìm kiếm hoặc lọc */}
+            {top5 &&
+              top5.length > 0 &&
+              !searchProduct &&
+              !selectedCategory &&
+              !selectedAuthor && (
+                <div
+                  className="col-lg-12 col-md-12 article"
+                  style={{ marginTop: "20px", marginBottom: "30px" }}
+                >
+                  {" "}
+                  <div className="section-title2">
+                    <h3
+                      className="title"
+                      style={{
+                        textAlign: "center",
+                        color: "#e94560",
+                        position: "relative",
+                        paddingBottom: "10px",
+                        marginBottom: "20px",
+                        animation:
+                          "titleGlow 1.5s ease-in-out infinite alternate",
+                      }}
+                    >
+                      ⭐ SẢN PHẨM BÁN CHẠY ⭐
+                    </h3>
+                    <style>
+                      {`
+                      @keyframes titleGlow {
+                        from {
+                          text-shadow: 0 0 5px rgba(233, 69, 96, 0.2),
+                                     0 0 10px rgba(233, 69, 96, 0.2);
+                        }
+                        to {
+                          text-shadow: 0 0 10px rgba(233, 69, 96, 0.5),
+                                     0 0 20px rgba(233, 69, 96, 0.3);
+                        }
+                      }
+                    `}
+                    </style>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      overflowX: "auto",
+                      justifyContent: "space-around",
+                      gap: "15px",
+                      padding: "10px 0",
+                      background:
+                        "linear-gradient(to right, #fff 0%, rgba(233, 69, 96, 0.05) 50%, #fff 100%)",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    {top5.map((product) => (
+                      <div
+                        style={{
+                          flex: "0 0 auto",
+                          width: "200px",
+                        }}
+                        key={product.product || product.name}
+                      >
+                        <div
+                          className="border-product shadow-sm"
+                          style={{
+                            background: "#fff",
+                            borderRadius: "8px",
+                            transition:
+                              "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+                            border: "1px solid rgba(233, 69, 96, 0.2)",
+                            animation: "pulse 2s infinite",
+                            position: "relative",
+                            overflow: "hidden",
+                            ":hover": {
+                              transform: "translateY(-5px)",
+                              boxShadow: "0 5px 15px rgba(233, 69, 96, 0.1)",
+                            },
+                            "@keyframes pulse": {
+                              "0%": {
+                                boxShadow: "0 0 0 0 rgba(233, 69, 96, 0.4)",
+                              },
+                              "70%": {
+                                boxShadow: "0 0 0 10px rgba(233, 69, 96, 0)",
+                              },
+                              "100%": {
+                                boxShadow: "0 0 0 0 rgba(233, 69, 96, 0)",
+                              },
+                            },
+                          }}
+                        >
+                          <Link
+                            to={`/products/${product.product || product.id}`}
+                          >
+                            <div
+                              className="shopBack"
+                              style={{
+                                width: "100%",
+                                height: "150px",
+                                background: "#fff",
+                                borderRadius: "8px 8px 0 0",
+                              }}
+                            >
+                              <img
+                                src={
+                                  product.image?.url ||
+                                  product.image ||
+                                  "./images/default-product.png"
+                                }
+                                alt={product.name}
+                                style={{
+                                  height: "140px",
+                                  objectFit: "contain",
+                                  padding: "5px",
+                                }}
+                              />
+                            </div>
+                          </Link>
+
+                          <div className="shoptext" style={{ padding: "8px" }}>
+                            <p
+                              style={{
+                                textAlign: "center",
+                                fontSize: "0.9rem",
+                                margin: "0 0 5px 0",
+                                height: "60px",
+                                overflow: "hidden",
+                                display: "-webkit-box",
+                                WebkitLineClamp: "2",
+                                WebkitBoxOrient: "vertical",
+                              }}
+                            >
+                              <Link
+                                to={`/products/${
+                                  product.product || product.id
+                                }`}
+                              >
+                                {product.name || "N/A"}
+                              </Link>
+                            </p>
+                            <div
+                              style={{
+                                textAlign: "center",
+                                fontSize: "0.85rem",
+                                color: "#fff",
+                                fontWeight: "600",
+                                background: "#e94560",
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                                display: "inline-block",
+                                margin: "0 auto",
+                              }}
+                            >
+                              ⭐ Đã bán: {product.sold || 0}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            <div className="col-lg-12 col-md-12 article">
+              <h3 className="title" style={{ textAlign: "center" }}>
+                SẢN PHẨM ĐANG BÁN
+              </h3>
               <div className="shopcontainer">
                 {loading ? (
                   <div className="mb-5">
@@ -441,73 +603,6 @@ const ShopSection = () => {
             </div>
           )}
         </div>
-        {/* TOP 5 SẢN PHẨM BÁN CHẠY */}
-        {top5 && top5.length > 0 && (
-          <div className="row" style={{ marginTop: "40px" }}>
-            <div className="col-lg-12 col-md-12 article">
-              <div className="section-title2">
-                <h3 className="title">TOP SẢN PHẨM BÁN CHẠY</h3>
-              </div>
-              <div className="shopcontainer row">
-                {top5.map((product) => (
-                  <div
-                    className="shop col-lg-3 col-md-6 col-sm-6"
-                    key={product.product || product.name}
-                  >
-                    <div className="border-product shadow-sm">
-                      <Link to={`/products/${product.product || product.id}`}>
-                        <div
-                          className="shopBack"
-                          style={{ width: "100%", height: "60%" }}
-                        >
-                          <img
-                            src={
-                              product.image?.url ||
-                              product.image ||
-                              "./images/default-product.png"
-                            }
-                            alt={product.name}
-                            style={{ height: "180px", objectFit: "contain" }}
-                          />
-                        </div>
-                      </Link>
-
-                      <div className="shoptext">
-                        <p style={{ textAlign: "center" }}>
-                          <Link
-                            to={`/products/${product.product || product.id}`}
-                          >
-                            {product.name || "N/A"}
-                          </Link>
-                        </p>
-                        <div
-                          className="sold-count"
-                          style={{
-                            textAlign: "center",
-                            marginTop: "10px",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: "0.9rem",
-                              color: "#000000",
-
-                              padding: "3px 7px",
-                              display: "inline-block",
-                              opacity: 1,
-                            }}
-                          >
-                            Đã bán: {product.sold || 0}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
