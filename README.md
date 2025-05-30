@@ -1,12 +1,140 @@
+# Nền tảng Thương mại điện tử BookShop
 
+Hệ thống bán sách trực tuyến với ba phần riêng biệt: Quản trị viên, Khách hàng và Server.
 
+## Cấu trúc dự án
 
+```text
+300525_BookShop/
+├── Admin/          # Ứng dụng quản trị
+├── Customer/       # Giao diện người dùng
+└── Server/         # Backend API server
+```
 
+## Tính năng chính
 
+### Giao diện khách hàng
+- Tìm kiếm và duyệt sản phẩm
+- Quản lý giỏ hàng 
+- Đặt hàng và theo dõi đơn hàng
+- Đánh giá và xếp hạng sản phẩm
+- Xem blog và video
+- Quản lý tài khoản cá nhân
+- Yêu cầu trả/hủy đơn hàng
 
+### Trang quản trị
+- Quản lý sản phẩm (CRUD)
+- Quản lý đơn hàng
+- Quản lý người dùng
+- Quản lý danh mục 
+- Kiểm soát kho
+- Quản lý khuyến mãi
+- Quản lý nhà cung cấp
+- Thống kê và báo cáo
+- Quản lý blog và video
 
+### Tính năng Backend
+- API RESTful
+- Xác thực JWT
+- Upload file
+- Cơ sở dữ liệu MongoDB
+- Server Express
+- Middleware xác thực và xử lý lỗi
 
+## Công nghệ sử dụng
 
+### Frontend (Admin & Customer)
+- React.js
+- Redux quản lý state
+- React Router điều hướng
+- Ant Design (UI Admin)
+- CSS responsive
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose ODM
+- JWT
+- Cloudinary
+- Express-async-handler
+
+## Hướng dẫn cài đặt
+
+### Yêu cầu hệ thống
+- Node.js v14 trở lên
+- MongoDB
+- NPM/Yarn
+
+### Các bước cài đặt
+
+1. Clone dự án:
+```bash
+git clone https://github.com/yourusername/300525_BookShop.git
+```
+
+2. Cài đặt Server:
+```bash
+cd Server
+npm install
+cp .env.example .env
+npm start
+```
+
+3. Cài đặt Admin:
+```bash
+cd Admin
+npm install
+npm start
+```
+
+4. Cài đặt Customer:
+```bash
+cd Customer
+npm install
+npm start
+```
+
+### Biến môi trường (.env)
+```env
+PORT=5000
+MONGO_URL=mongodb://localhost:27017/bookshop
+JWT_SECRET=your_secret
+CLOUDINARY_NAME=your_name
+CLOUDINARY_KEY=your_key
+CLOUDINARY_SECRET=your_secret
+```
+
+## API Endpoints
+Các endpoint chính:
+- `/api/products` - Quản lý sản phẩm
+- `/api/users` - Quản lý người dùng
+- `/api/orders` - Quản lý đơn hàng
+- `/api/categories` - Quản lý danh mục
+- `/api/upload` - Upload file
+- `/api/stats` - Thống kê
+- `/api/promotions` - Quản lý khuyến mãi
+- `/api/suppliers` - Quản lý nhà cung cấp
+
+## Giấy phép
+
+ISC
+
+## Tác giả
+Nguyễn Hải Đăng
+
+## Liên hệ
+Email: haidanghaui2021@gmail.com
+
+## Phiên bản
+1.0.0
+
+## Lưu ý
+- Đảm bảo cấu hình đúng biến môi trường trước khi chạy
+- Yêu cầu kết nối internet để sử dụng Cloudinary
+- Khuyến nghị sử dụng Node.js phiên bản LTS
+
+---------------------------------------------------------------------------------------------------------------
 
 
 # BookShop E-commerce Platform
@@ -141,3 +269,4 @@ ISC License
 ## Authors
 
 Hai Dang Nguyen
+Email: haidanghaui2021@gmail.com
