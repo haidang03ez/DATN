@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import { lisCategories } from "../../redux/Actions/CategoryActions";
 import { listProduct } from "../../redux/Actions/ProductActions";
+import { addToCart } from "../../redux/Actions/CartActions";
 import { ORDER_DETAILS_RESET } from "../../redux/Constants/OrderConstants";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
@@ -157,6 +158,11 @@ const ShopSection = () => {
     (blogPage - 1) * blogsPerPage,
     blogPage * blogsPerPage
   );
+
+  const handleAddToCart = (productId) => {
+    dispatch(addToCart(productId, 1));
+    history.push("/cart");
+  };
 
   return (
     <>
@@ -434,51 +440,98 @@ const ShopSection = () => {
                               value={product.rating}
                               text={`${product.numReviews} reviews`}
                             />
-                            {product.appliedPromotion &&
-                            product.discountedPrice < product.originalPrice ? (
-                              <div>
-                                <h3 style={{ color: "#dc3545" }}>
-                                  {product.discountedPrice.toLocaleString()} VND
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                marginTop: "10px",
+                              }}
+                            >
+                              {product.appliedPromotion &&
+                              product.discountedPrice <
+                                product.originalPrice ? (
+                                <div>
+                                  <h3 style={{ color: "#dc3545", margin: 0 }}>
+                                    {product.discountedPrice.toLocaleString()}{" "}
+                                    VND
+                                  </h3>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "10px",
+                                    }}
+                                  >
+                                    <h5
+                                      style={{
+                                        fontSize: "0.9rem",
+                                        textDecoration: "line-through",
+                                        color: "#6c757d",
+                                        margin: 0,
+                                      }}
+                                    >
+                                      {product.originalPrice.toLocaleString()}{" "}
+                                      VND
+                                    </h5>
+                                    <span
+                                      style={{
+                                        backgroundColor: "#dc3545",
+                                        color: "white",
+                                        padding: "2px 6px",
+                                        borderRadius: "4px",
+                                        fontSize: "14px",
+                                      }}
+                                    >
+                                      -
+                                      {
+                                        product.appliedPromotion
+                                          .discountPercentage
+                                      }
+                                      %
+                                    </span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <h3 style={{ margin: 0 }}>
+                                  {(product.price || 0).toLocaleString()} VND
                                 </h3>
-                                <div
+                              )}
+
+                              {product.countInStock > 0 && (
+                                <button
+                                  onClick={() => handleAddToCart(product._id)}
                                   style={{
+                                    backgroundColor: "#28a745",
+                                    color: "white",
+                                    border: "none",
+                                    width: "60px",
+                                    height: "60px",
+                                    borderRadius: "50%",
+                                    cursor: "pointer",
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: "10px",
+                                    justifyContent: "center",
+                                    transition:
+                                      "transform 0.2s, background-color 0.3s",
                                   }}
+                                  onMouseOver={(e) => {
+                                    e.target.style.backgroundColor = "#218838";
+                                    e.target.style.transform = "scale(1.1)";
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.target.style.backgroundColor = "#28a745";
+                                    e.target.style.transform = "scale(1)";
+                                  }}
+                                  title="Thêm vào giỏ hàng"
                                 >
-                                  <h5
-                                    style={{
-                                      fontSize: "0.9rem",
-                                      textDecoration: "line-through",
-                                      color: "#6c757d",
-                                    }}
-                                  >
-                                    {product.originalPrice.toLocaleString()} VND
-                                  </h5>
-                                  <span
-                                    style={{
-                                      backgroundColor: "#dc3545",
-                                      color: "white",
-                                      padding: "2px 6px",
-                                      borderRadius: "4px",
-                                      fontSize: "14px",
-                                    }}
-                                  >
-                                    -
-                                    {
-                                      product.appliedPromotion
-                                        .discountPercentage
-                                    }
-                                    %
-                                  </span>
-                                </div>
-                              </div>
-                            ) : (
-                              <h3>
-                                {(product.price || 0).toLocaleString()} VND
-                              </h3>
-                            )}
+                                  <i
+                                    className="fas fa-shopping-cart"
+                                    style={{ fontSize: "16px" }}
+                                  ></i>
+                                </button>
+                              )}
+                            </div>
                             {product.countInStock === 0 ? (
                               <div className="out-of-stock-badge">Hết hàng</div>
                             ) : product.countInStock < 10 ? (

@@ -73,7 +73,7 @@ const CartScreen = ({ match, location, history }) => {
                   </Link>
                 </div>
                 <div className="cart-qty col-md-2 col-sm-5 mt-md-5 mt-3 mt-md-0 d-flex flex-column justify-content-center">
-                  <h6>Số lượng</h6>
+                  <h6>Chọn số lượng</h6>
                   <select
                     value={item.qty}
                     onChange={(e) =>
