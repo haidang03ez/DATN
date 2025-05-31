@@ -287,7 +287,7 @@ productRouter.put(
 productRouter.get(
     "/inventory/stats",
     protect,
-    admin,
+    protectInventoryManager,
     asyncHandler(async (req, res) => {
         const products = await Product.find({});
         // console.log(
