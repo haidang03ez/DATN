@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import * as XLSX from "xlsx";
+import Charts from "./Charts";
 import {
   FaShoppingCart,
   FaMoneyBillWave,
@@ -17,6 +19,7 @@ import {
   FaUndo,
   FaTimesCircle,
   FaQuestionCircle,
+  FaFileExcel,
 } from "react-icons/fa";
 
 const StatisticsManager = () => {
@@ -57,12 +60,12 @@ const StatisticsManager = () => {
       processing: "Đang chuẩn bị hàng",
       shipping: "Đang giao hàng",
       delivered: "Đã giao hàng",
-      cancellation_requested: "Khách yêu cầu hủy",
+      cancellationRequested: "Khách yêu cầu hủy",
       cancelled: "Đã hủy",
-      return_requested: "Khách yêu cầu hoàn",
+      returnRequested: "Khách yêu cầu hoàn",
       returned: "Đã hoàn",
-      cancellation_rejected: "Admin từ chối hủy",
-      return_rejected: "Admin từ chối hoàn",
+      cancellationRejected: "Admin từ chối hủy",
+      returnRejected: "Admin từ chối hoàn",
       totalOrders: "Tổng số đơn hàng",
     };
     return statuses[statusKey] || statusKey;
@@ -75,13 +78,127 @@ const StatisticsManager = () => {
     processing: <FaTasks className="me-2 text-primary" />,
     shipping: <FaShippingFast className="me-2 text-primary" />,
     delivered: <FaCheckCircle className="me-2 text-success" />,
-    cancellation_requested: <FaQuestionCircle className="me-2 text-warning" />,
+    cancellationRequested: <FaQuestionCircle className="me-2 text-warning" />,
     cancelled: <FaTimesCircle className="me-2 text-danger" />,
-    return_requested: <FaQuestionCircle className="me-2 text-warning" />,
+    returnRequested: <FaQuestionCircle className="me-2 text-warning" />,
     returned: <FaUndo className="me-2 text-dark" />,
-    cancellation_rejected: <FaTimesCircle className="me-2 text-danger" />,
-    return_rejected: <FaTimesCircle className="me-2 text-dark" />,
+    cancellationRejected: <FaTimesCircle className="me-2 text-danger" />,
+    returnRejected: <FaTimesCircle className="me-2 text-dark" />,
     totalOrders: <FaClipboardList className="me-2 text-info" />,
+  };
+
+  // Hàm xuất Excel
+  const exportToExcel = () => {
+    if (!stats) return;
+
+    // Tạo workbook mới
+    const workbook = XLSX.utils.book_new();
+
+    // 1. Sheet Tổng quan
+    const summaryData = [
+      ["THỐNG KÊ DOANH THU VÀ ĐƠN HÀNG"],
+      [
+        "Thời gian:",
+        from ? `Từ ${from}` : "Tất cả thời gian",
+        to ? `Đến ${to}` : "",
+      ],
+      [""],
+      ["Tổng sản phẩm bán ra:", stats.summary.totalSoldUnits || 0],
+      ["Tổng doanh thu:", `${formatCurrency(stats.summary.totalRevenue)} VND`],
+      ["Tổng lợi nhuận:", `${formatCurrency(stats.summary.totalProfit)} VND`],
+      ["Tổng số đơn hàng:", stats.summary.totalOrders || 0],
+      [""],
+      ["THỐNG KÊ TRẠNG THÁI ĐƠN HÀNG"],
+    ];
+
+    // Thêm thống kê trạng thái đơn hàng
+    Object.entries(stats.orderStatusCounts || {}).forEach(([status, count]) => {
+      summaryData.push([translateOrderStatus(status), count]);
+    });
+
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, "Tổng quan");
+
+    // 2. Sheet Chi tiết sản phẩm
+    if (stats.detailedProductStats && stats.detailedProductStats.length > 0) {
+      const productsData = [
+        ["CHI TIẾT SẢN PHẨM ĐÃ BÁN"],
+        [""],
+        ["Tên sản phẩm", "Giá nhập", "Giá bán", "Số lượng bán", "Lợi nhuận"],
+      ];
+
+      stats.detailedProductStats.forEach((product) => {
+        productsData.push([
+          product.name || "N/A",
+          `${formatCurrency(product.purchasePrice)} VND`,
+          `${formatCurrency(product.sellingPrice)} VND`,
+          product.sold || 0,
+          `${formatCurrency(
+            (product.sellingPrice - product.purchasePrice) * product.sold
+          )} VND`,
+        ]);
+      });
+
+      const productsSheet = XLSX.utils.aoa_to_sheet(productsData);
+      XLSX.utils.book_append_sheet(
+        workbook,
+        productsSheet,
+        "Chi tiết sản phẩm"
+      );
+    }
+
+    // 3. Sheet Top sản phẩm
+    if (stats.top5SoldProducts && stats.top5SoldProducts.length > 0) {
+      const topProductsData = [
+        ["TOP 5 SẢN PHẨM BÁN CHẠY NHẤT"],
+        [""],
+        ["Tên sản phẩm", "Giá nhập", "Giá bán", "Số lượng bán", "Lợi nhuận"],
+      ];
+
+      stats.top5SoldProducts.forEach((product) => {
+        topProductsData.push([
+          product.name || "N/A",
+          `${formatCurrency(product.purchasePrice)} VND`,
+          `${formatCurrency(product.sellingPrice)} VND`,
+          product.sold || 0,
+          `${formatCurrency(
+            (product.sellingPrice - product.purchasePrice) * product.sold
+          )} VND`,
+        ]);
+      });
+
+      const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
+      XLSX.utils.book_append_sheet(workbook, topProductsSheet, "Top sản phẩm");
+    }
+
+    // Tự động điều chỉnh độ rộng cột cho tất cả các sheet
+    const sheets = ["Tổng quan", "Chi tiết sản phẩm", "Top sản phẩm"];
+    sheets.forEach((sheet) => {
+      const ws = workbook.Sheets[sheet];
+      if (ws) {
+        const range = XLSX.utils.decode_range(ws["!ref"]);
+        const cols = [];
+        for (let i = range.s.c; i <= range.e.c; i++) {
+          let maxWidth = 10;
+          for (let j = range.s.r; j <= range.e.r; j++) {
+            const cell = ws[XLSX.utils.encode_cell({ r: j, c: i })];
+            if (cell && cell.v) {
+              const width = (cell.v.toString().length + 2) * 1.2;
+              maxWidth = Math.max(maxWidth, width);
+            }
+          }
+          cols.push({ wch: maxWidth });
+        }
+        ws["!cols"] = cols;
+      }
+    });
+
+    // Xuất file
+    const date = new Date();
+    const fileName = `thong_ke_${date.getDate()}_${
+      date.getMonth() + 1
+    }_${date.getFullYear()}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
   };
 
   return (
@@ -118,18 +235,29 @@ const StatisticsManager = () => {
               onChange={(e) => setTo(e.target.value)}
             />
           </div>
-          <div className="col-md-4 d-flex align-items-end">
+          <div className="col-md-4 d-flex align-items-end gap-2">
             <button
-              className="btn btn-primary w-100"
+              className="btn btn-primary d-flex align-items-center justify-content-center"
               type="submit"
               disabled={loading}
+              style={{ flex: 1, minHeight: "38px" }}
             >
               {loading ? (
-                <span className="spinner-border spinner-border-sm"></span>
+                <span className="spinner-border spinner-border-sm me-2"></span>
               ) : (
                 <FaSearch className="me-2" />
               )}
-              Xem thống kê
+              <span>Xem thống kê</span>
+            </button>
+            <button
+              className="btn btn-success d-flex align-items-center justify-content-center"
+              type="button"
+              onClick={exportToExcel}
+              disabled={loading || !stats}
+              style={{ flex: 1, minHeight: "38px", height: "42px", backgroundColor: "#28a745" }}
+            >
+              <FaFileExcel className="me-2" />
+              <span>Xuất biên bản</span>
             </button>
           </div>
         </form>
@@ -184,6 +312,8 @@ const StatisticsManager = () => {
               </div>
             </div>
 
+            <Charts stats={stats} />
+
             <h5 className="mt-4 mb-3">
               <FaClipboardList className="me-2" />
               Thống kê trạng thái đơn hàng
@@ -192,7 +322,6 @@ const StatisticsManager = () => {
               {stats.orderStatusCounts &&
                 Object.entries(stats.orderStatusCounts).map(
                   ([statusKey, count]) => (
-                    
                     <div className="col-md-3 col-sm-6" key={statusKey}>
                       <div className="statistics-item status-count-item h-100">
                         <i>
